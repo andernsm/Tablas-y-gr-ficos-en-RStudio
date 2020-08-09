@@ -1,0 +1,195 @@
+---
+title: "Medidas de tendencia central y dispersión"
+author: "Anderson N. Soriano-Moreno"
+date: "2020/08/05"
+output: 
+  html_document:
+    toc: TRUE
+    number_sections: TRUE
+    toc_float: TRUE
+    code_folding:
+    df_print: 
+    highlight: tango
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning=FALSE,
+                      message = FALSE,
+                      fig.align = "center")
+library(psych)
+library(ggplot2)
+library(ggpubr)
+library(gridExtra)
+```
+
+## Importando base de datos  
+
+### En CSV
+
+1. Utilizamos el comando **"read.csv()**" 
+2. Entre dos paréntesis y dos comillas ponemos la dirección de base de datos en formato *csv*.
+3. Cargamos la base de datos con el nombres "datos" que lo ponemos a la izquierda después de una flecha **"<-"**. 
+
+Mira el ejemplo.
+
+```{r, echo=F}
+datos <- read.csv("~/R/Projects/LeaRning/Normalidad/data/base_datos.csv")
+
+datos <- read.csv("~/R/Projects/LeaRning/Normalidad/data/base_datos.csv")
+```
+
+```{r, eval=F}
+datos <- read.csv("~Documentos/Proyecto/base_datos.csv")
+```
+
+### En Excel
+
+1. Instalamos el paquete **"readxl"** con el comando **install.packages("readxl")**
+2. Cargamos el paquetes **"readxl"** con el comando **library(readxl)**
+3. Utilizamos el comando **"read_xlsx()"**. Entre dos paréntesis y dos comillas ponemos la dirección de base de datos en formato *xlsx*.
+5. Cargamos la base de datos con el nombres "datos" que lo ponemos a la izquierda después de una flecha **"<-"**. 
+
+Mira el ejemplo.
+
+```{r echo=TRUE, eval=F}
+install.packages("readxl")
+library(readxl)
+datos <- read_xlsx("~Documentos/Proyecto/base_datos.xlsx")
+```
+
+## Explorando base
+
+### Visualizandola
+
+Usamos el comando **head()**
+
+```{r}
+head(datos)
+```
+
+### Viendo clases de variables
+
+Usamos el comando **str()**
+
+```{r}
+str(datos)
+```
+
+## Explorando variable
+
+1. Para seleccionar una variable en R primero escribimos el nombre de la base de datos, en este caso *"datos"*. A continuación escribimos el símbolo **"$"**. 
+2. Si en este punto hacemos click en la tacla **Tab** en el taclado, aparecera un menu desplegable con el nombre de las variables que hay dentro de esa base de datos. Podemos seleccionar la variable que deseamos en ese menú, o también escribirla.
+
+Para explorar la variable de forma general podemos utilizar el comando **"summary()"** que nos brindará varios parámetros descriptivos.
+
+```{r}
+summary(datos$edad)
+```
+
+De la misma forma, se puede calcular la **media, mediana, desviacion estandar y rangos intercuartílico**.
+
+### Media
+```{r}
+mean(datos$edad)
+```
+### Mediana
+```{r}
+median(datos$edad)
+```
+### Desviación standar
+```{r}
+sd(datos$edad)
+```
+### Rangos intercuartílicos
+```{r}
+quantile(datos$edad)
+```
+
+## Evaluando normalidad
+
+### Metodos descriptivos
+
+Ahora si queremos calcular además la kurtosis y la skewness utilizaremos el comando "describe()" de la librería **"psych"**. Para esto,  instalamos el paquete y seguido lo abrimos. Finalmente dentro del comando **"describe()"** ponemos la variable que deseemos evaluar.
+
+```{r, eval=F}
+install.packages("psych")
+library(psych)
+```
+
+Mira el ejemplo
+
+```{r}
+describe(datos$edad)
+describe(datos$pab)
+describe(datos$pct_grasa)
+describe(datos$imc)
+```
+
+## Metodos graficos
+
+### Histograma
+
+Hay dos formas de realizar un histograma, utilizando el comando **hist()** o el comando **ggplot()**. Utilizamos la variable edad, de ejemplo.
+
+
+```{r, eval=F}
+# Utilizando hist
+hist(datos$variable)
+
+
+# Utilizando ggplot
+install.packages("tidyverse")
+library(tidyverse)
+ggplot(datos, aes(variable)) + geom_histogram()
+```
+
+#### Ejemplo histograma
+```{r}
+hist(datos$edad, breaks = 20)
+```
+
+#### Ejemplo ggplot
+```{r}
+ggplot(datos, aes(edad)) + geom_histogram()
+```
+
+#### Gráfico quantil quantil
+
+Utilizamos el paquete **ggpubr** y el comando **ggqqplot()**
+
+```{r, eval=F}
+install.packages("ggpubr")
+library(ggpubr)
+ggqqplot(datos$variable)
+```
+
+#### Ejemplo qqplot
+
+```{r}
+ggqqplot(datos$edad)
+```
+
+### Comparación hist y qqplot
+
+```{r, echo=F}
+library(ggplot2)
+library(ggpubr)
+library(gridExtra)
+
+p1 <- ggplot(datos, aes(edad)) + geom_histogram(bins = 30, color="darkblue", fill="lightblue") + theme_minimal() + xlab("Edad")
+p2 <- ggplot(datos, aes(pab)) + geom_histogram(bins = 30, color="darkblue", fill="lightblue") + theme_minimal() + xlab("Perimetro abdominal")
+p3 <- ggplot(datos, aes(pct_grasa)) + geom_histogram(bins = 30, color="darkblue", fill="lightblue") + theme_minimal() + xlab("% de grasa")
+p4 <- ggqqplot(datos$edad) + xlab("Edad")
+p5 <- ggqqplot(datos$pab)  + xlab("Perimetro abdominal")
+p6 <- ggqqplot(datos$pct_grasa) + xlab("% de grasa")
+
+grid.arrange(p1, p4, p2, p5, p3, p6, ncol = 2, nrow=3)
+```
+
+
+
+
+
